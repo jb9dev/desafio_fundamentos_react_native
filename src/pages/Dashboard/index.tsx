@@ -35,14 +35,17 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     async function loadProducts(): Promise<void> {
-      // TODO
+      const { data } = await api.get<Product[]>('/products');
+      const loadedProducts = data;
+      setProducts(loadedProducts);
     }
 
     loadProducts();
   }, []);
 
   function handleAddToCart(item: Product): void {
-    // TODO
+    addToCart(item);
+    // TODO: Refletir se a lógica de verificar se o item já existe no carrinho para incrementar ou adicionar precisaria ser feita aqui ou no addToCart
   }
 
   return (

@@ -30,22 +30,31 @@ const CartProvider: React.FC = ({ children }) => {
 
   useEffect(() => {
     async function loadProducts(): Promise<void> {
-      // TODO LOAD ITEMS FROM ASYNC STORAGE
+      const storagedProducts = await AsyncStorage.getItem('products');
+      if (storagedProducts) {
+        setProducts(JSON.parse(storagedProducts));
+      }
     }
 
     loadProducts();
   }, []);
 
-  const addToCart = useCallback(async product => {
-    // TODO ADD A NEW ITEM TO THE CART
-  }, []);
+  const addToCart = useCallback(
+    async product => {
+      // TODO: Verificar se o item já está no carrinho, se sim, chamar a função de incremento, se não setar o produto no state. Refletir se o certo é aqui atualizar os dados no AsyncStorage. Talvez seja o caso de ter um método só pra isso, para não ter que repetir esse mesmo código também no incremento e no decremento
+      setProducts([...products, product]);
+    },
+    [products],
+  );
 
   const increment = useCallback(async id => {
     // TODO INCREMENTS A PRODUCT QUANTITY IN THE CART
+    // TODO: Além de incrementar, vou precisar atualizar as informações no AsyncStorage
   }, []);
 
   const decrement = useCallback(async id => {
     // TODO DECREMENTS A PRODUCT QUANTITY IN THE CART
+    // TODO: Além de decrementar, vou precisar atualizar as informações no AsyncStorage
   }, []);
 
   const value = React.useMemo(

@@ -37,9 +37,9 @@ const CartProvider: React.FC = ({ children }) => {
     loadProducts();
   }, []);
 
-  const saveLocally = useCallback(async () => {
-    await AsyncStorage.setItem('products', JSON.stringify(products));
-  }, [products]);
+  const saveLocally = useCallback(async (update: Product[]) => {
+    await AsyncStorage.setItem('products', JSON.stringify(update));
+  }, []);
 
   const increment = useCallback(
     id => {
@@ -51,7 +51,7 @@ const CartProvider: React.FC = ({ children }) => {
         return product;
       });
       setProducts(productsUpdated);
-      saveLocally();
+      saveLocally(productsUpdated);
     },
     [saveLocally, products],
   );
@@ -71,7 +71,7 @@ const CartProvider: React.FC = ({ children }) => {
       );
 
       setProducts(productsFiltered);
-      saveLocally();
+      saveLocally(productsFiltered);
     },
     [saveLocally, products],
   );
@@ -83,9 +83,12 @@ const CartProvider: React.FC = ({ children }) => {
         increment(product.id);
       } else {
         product.quantity = 1;
-        setProducts([...products, product]);
-        saveLocally();
+        const productsUpdated = [...products, product];
+        setProducts(productsUpdated);
+        saveLocally(productsUpdated);
       }
+
+      console.log('products: ', products);
     },
     [products, increment, saveLocally],
   );

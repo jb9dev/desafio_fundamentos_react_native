@@ -31,31 +31,64 @@ const CartProvider: React.FC = ({ children }) => {
   useEffect(() => {
     async function loadProducts(): Promise<void> {
       const storagedProducts = await AsyncStorage.getItem('products');
-      if (storagedProducts) {
-        setProducts(JSON.parse(storagedProducts));
-      }
+      storagedProducts && setProducts(JSON.parse(storagedProducts));
     }
 
     loadProducts();
   }, []);
 
-  const addToCart = useCallback(
-    async product => {
-      // TODO: Verificar se o item já está no carrinho, se sim, chamar a função de incremento, se não setar o produto no state. Refletir se o certo é aqui atualizar os dados no AsyncStorage. Talvez seja o caso de ter um método só pra isso, para não ter que repetir esse mesmo código também no incremento e no decremento
-      setProducts([...products, product]);
+  const saveLocally = useCallback(async () => {
+    await AsyncStorage.setItem('products', JSON.stringify(products));
+  }, [products]);
+
+  const increment = useCallback(
+    id => {
+      const productsUpdated = products.map(product => {
+        if (product.id === id) {
+          product.quantity++;
+        }
+
+        return product;
+      });
+      setProducts(productsUpdated);
+      saveLocally();
     },
-    [products],
+    [saveLocally, products],
   );
 
-  const increment = useCallback(async id => {
-    // TODO INCREMENTS A PRODUCT QUANTITY IN THE CART
-    // TODO: Além de incrementar, vou precisar atualizar as informações no AsyncStorage
-  }, []);
+  const decrement = useCallback(
+    id => {
+      const productsUpdated = products.map(product => {
+        if (product.id === id) {
+          product.quantity--;
+        }
 
-  const decrement = useCallback(async id => {
-    // TODO DECREMENTS A PRODUCT QUANTITY IN THE CART
-    // TODO: Além de decrementar, vou precisar atualizar as informações no AsyncStorage
-  }, []);
+        return product;
+      });
+
+      const productsFiltered = productsUpdated.filter(
+        product => product.quantity > 0,
+      );
+
+      setProducts(productsFiltered);
+      saveLocally();
+    },
+    [saveLocally, products],
+  );
+
+  const addToCart = useCallback(
+    product => {
+      const findProduct = products.find(item => item.id === product.id);
+      if (findProduct) {
+        increment(product.id);
+      } else {
+        product.quantity = 1;
+        setProducts([...products, product]);
+        saveLocally();
+      }
+    },
+    [products, increment, saveLocally],
+  );
 
   const value = React.useMemo(
     () => ({ addToCart, increment, decrement, products }),

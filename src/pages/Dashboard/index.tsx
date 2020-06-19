@@ -45,7 +45,6 @@ const Dashboard: React.FC = () => {
 
   function handleAddToCart(item: Product): void {
     addToCart(item);
-    // TODO: Refletir se a lógica de verificar se o item já existe no carrinho para incrementar ou adicionar precisaria ser feita aqui ou no addToCart
   }
 
   return (

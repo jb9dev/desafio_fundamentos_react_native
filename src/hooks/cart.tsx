@@ -43,13 +43,11 @@ const CartProvider: React.FC = ({ children }) => {
 
   const increment = useCallback(
     id => {
-      const productsUpdated = products.map(product => {
-        if (product.id === id) {
-          product.quantity++;
-        }
-
-        return product;
-      });
+      const productsUpdated = products.map(product =>
+        product.id === id
+          ? { ...product, quantity: product.quantity + 1 }
+          : product,
+      );
       setProducts(productsUpdated);
       saveLocally(productsUpdated);
     },
@@ -58,13 +56,11 @@ const CartProvider: React.FC = ({ children }) => {
 
   const decrement = useCallback(
     id => {
-      const productsUpdated = products.map(product => {
-        if (product.id === id) {
-          product.quantity--;
-        }
-
-        return product;
-      });
+      const productsUpdated = products.map(product =>
+        product.id === id
+          ? { ...product, quantity: product.quantity - 1 }
+          : product,
+      );
 
       const productsFiltered = productsUpdated.filter(
         product => product.quantity > 0,
@@ -78,17 +74,17 @@ const CartProvider: React.FC = ({ children }) => {
 
   const addToCart = useCallback(
     product => {
-      const findProduct = products.find(item => item.id === product.id);
+      const findProduct = products.find(
+        foundProduct => foundProduct.id === product.id,
+      );
+
       if (findProduct) {
         increment(product.id);
       } else {
-        product.quantity = 1;
-        const productsUpdated = [...products, product];
+        const productsUpdated = [...products, { ...product, quantity: 1 }];
         setProducts(productsUpdated);
         saveLocally(productsUpdated);
       }
-
-      console.log('products: ', products);
     },
     [products, increment, saveLocally],
   );
